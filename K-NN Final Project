@@ -1,0 +1,112 @@
+# This notebook outlines the ML model using k-Nearest Neighbors algorithm. We will 
+# 1. Load data, Explore data // pandas
+# 2. Visualise the dataset //seaborn
+# 3. Determine the number of neighbours //model->KNN
+# 4. Predict the colour of the fruit - apple, mandarin, orange, lemon
+# The following set of commands will load the necessary Python libraries
+
+# for linear algebra, random number capabilities
+import numpy as np
+
+# for data manipulation, analysis and reading our dataset
+import pandas as pd
+
+# for plotting and visualizing the data
+import matplotlib.pyplot as plt
+
+# 1. IMPORT & EXPLORE DATA
+### Load the data
+# Now that we have imported the necessary libraries, we will now use the panda command to load our dataset, which in the CSV format. You can also load CSV, TXT etc.
+# The file below is loaded from the same folder where the notebook is saved, and hence no file path is provided
+dataset = pd.read_csv('diabetes.csv')
+# Replace null values
+dataset = dataset.copy(deep = True)
+dataset[['Glucose','BloodPressure','SkinThickness','Insulin','BMI']] = dataset[['Glucose','BloodPressure','SkinThickness','Insulin','BMI']].replace(0,np.NaN)
+## showing the count of Nans
+print(dataset.isnull().sum())
+
+dataset['Glucose'].fillna(dataset['Glucose'].mean(), inplace = True)
+dataset['BloodPressure'].fillna(dataset['BloodPressure'].mean(), inplace = True)
+dataset['SkinThickness'].fillna(dataset['SkinThickness'].median(), inplace = True)
+dataset['Insulin'].fillna(dataset['Insulin'].median(), inplace = True)
+dataset['BMI'].fillna(dataset['BMI'].median(), inplace = True)
+import pylab as pl
+p = dataset.hist(figsize = (20,20))
+pl.suptitle("Histogram for each numeric input variable")
+pl.savefig('Diabetes Histogram')
+pl.show()
+
+
+print(dataset.isnull().sum())
+# Now that the dataset is loaded, let's check the data and it's features using the head command
+dataset.head()
+# head function in python with no arguments gets the first five rows of data, and tail function the last 5
+
+# 3. K-Nearest Neighbors
+### Build the KNN classifier model to determine K
+# First, import the KNeighborsClassifier module
+# details about the module here: https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html
+from sklearn.neighbors import KNeighborsClassifier
+# In order to understand the model performance, divide the dataset into a training set and a test set.
+# The split is done by using the function train_test_split()
+# details here: https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html
+from sklearn.model_selection import train_test_split
+# Split the dataset into two different datasets
+# X for the independent features such as mass, width, height
+# Y for the dependent feature i.e. fruit name
+X = dataset[['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age']] #input
+Y = dataset['Outcome'] ##output
+# Now split the dataset X into two separate sets — X_train and X_test 
+# Similarly, split the dataset Y into two sets — y_train and y_test
+X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size = 0.2, random_state = 0)
+# Notice the use of test_size. This parameter decides the size of the data that has to be split as the test dataset
+# In the above case it is 0.2, which means that the dataset will be split 20% as the test dataset
+### Let's look at the statistical summary using describe() method
+X_train.describe()
+
+X_test.describe()
+
+### Invoke the classifier and Training the model
+# Now create a KNN classifier for making predictions
+knn = KNeighborsClassifier()
+
+# Train the model using the training sets
+knn.fit(X_train, y_train)
+KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+		                     metric_params=None, n_jobs=None, n_neighbors=5, p=2,
+		                     weights='uniform')
+# Note the output above that by default the n_neighbors = 5
+
+### Evaluate the accuracy of the model for K=5
+# Model Accuracy, how often is the classifier correct?
+# Accuracy can be computed by comparing actual test set values and predicted values.
+# The score function is simply a utility function for a default metric to be used within some algorithms of scikit-learn
+knn.score(X_test, y_test)
+print("Accuracy for K=5 : ", knn.score(X_test, y_test))
+
+##K=6
+knn = KNeighborsClassifier(n_neighbors = 6)
+knn.fit(X_train, y_train)
+knn.score(X_test, y_test)
+print("Accuracy for K=6 : ", knn.score(X_test, y_test))
+
+
+##K=7
+knn = KNeighborsClassifier(n_neighbors = 7)
+knn.fit(X_train, y_train)
+knn.score(X_test, y_test)
+print("Accuracy for K=7 : ", knn.score(X_test, y_test))
+
+
+##K=8
+knn = KNeighborsClassifier(n_neighbors = 8)
+knn.fit(X_train, y_train)
+knn.score(X_test, y_test)
+print("Accuracy for K=8 : ", knn.score(X_test, y_test))
+
+##K=9
+knn = KNeighborsClassifier(n_neighbors = 9)
+knn.fit(X_train, y_train)
+knn.score(X_test, y_test)
+print("Accuracy for K=9 : ", knn.score(X_test, y_test))
+
